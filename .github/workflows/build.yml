@@ -1,1 +1,65 @@
+name: Build & Deploy Nexus BI Light
+on:
+  push:
+    branches: [main]
 
+jobs:
+
+  deploy-web:
+    name: Deploy Web (Link Mobile)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copiar HTML para pasta de deploy
+        run: |
+          mkdir -p web-deploy
+          cp nexus-bi-light.html web-deploy/index.html
+      - name: Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web-deploy
+
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependencias
+        run: npm install
+      - name: Build web assets
+        run: npm run build
+      - name: Gerar instalador exe
+        run: npx electron-builder --win --publish never
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusBI-Light-Windows
+          path: dist-electron/*.exe
+          retention-days: 30
+
+  build-mac:
+    name: Build macOS (.dmg)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependencias
+        run: npm install
+      - name: Build web assets
+        run: npm run build
+      - name: Gerar instalador dmg
+        run: npx electron-builder --mac --publish never
+      - name: Upload dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusBI-Light-macOS
+          path: dist-electron/*.dmg
+          retention-days: 30
