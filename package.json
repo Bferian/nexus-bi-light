@@ -17,13 +17,16 @@
     "directories": { "output": "dist-electron" },
     "files": [
       "electron/**/*",
-      "nexus-bi-light.html"
+      "nexus-bi-light.html",
+      "public/**/*"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "public/icon.ico"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "public/icon.icns"
     },
     "nsis": {
       "oneClick": true,
